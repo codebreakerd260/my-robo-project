@@ -1,0 +1,107 @@
+Hardware Layer [icon: cpu, color: red] {
+  Wheels Encoders [icon: settings, label: "Wheels + Encoders"]
+  Arms Servos [icon: cpu, label: "Arms + Servos"]
+  IMU [icon: activity]
+  RPLIDAR [icon: radio]
+  Realsense Camera [icon: camera]
+  Microphone [icon: mic]
+  Speaker [icon: volume-2]
+  Display LEDs [icon: monitor, label: "Display / LEDs"]
+  GPS [icon: map-pin]
+}
+
+ESP32 Micro-ROS [icon: zap, color: orange, label: "ESP32 Micro-ROS (Real-time Control)"] {
+  Encoder Publisher [icon: upload, label: "Encoder Publisher"]
+  Arm Publisher [icon: upload, label: "Arm Publisher"]
+  IMU Publisher [icon: upload, label: "IMU Publisher"]
+  Command Subscriber [icon: download, label: "Command Subscriber"]
+}
+
+Raspberry Pi 4 ROS2 Core [icon: raspberry-pi, color: blue, label: "Raspberry Pi 4 ROS2 Core"] {
+  ROS2 Core [icon: cpu, label: "ROS 2 Core"]
+  Navigation2 [icon: map, label: "Navigation2 (SLAM/Planning)"]
+  MoveIt3 [icon: cpu, label: "MoveIt3 (Arm Control)"]
+  Perception [icon: eye, label: "Perception (Camera/LIDAR/Audio)"]
+  RViz rqt [icon: bar-chart-2, label: "RViz / rqt"]
+}
+
+Backend API [icon: cloud, color: purple, label: "Backend / API"] {
+  ROSBridge FastAPI Bridge [icon: link, label: "ROSBridge / FastAPI Bridge"]
+  API Server [icon: rocket, label: "API Server (Fastify / Nest.js)"]
+  Database MQ TSDB [icon: database, label: "Database / MQ / TSDB"]
+}
+
+Unity Digital Twin [icon: gamepad, color: green, label: "Unity Digital Twin"] {
+  Focus Manager [icon: user, label: "Focus Manager (Bot / Person / Object)"]
+  Input Router [icon: gamepad, label: "Input Router (Focus-aware)"]
+  Entity Prefabs [icon: layers, label: "Entity Prefabs (Bot / Person / Object)"]
+  Real Sim Mapper [icon: globe, label: "Real ↔ Sim Mapper (LiDAR/Camera → Unity)"]
+}
+
+Frontend Interfaces [icon: monitor, color: blue, label: "Frontend Interfaces"] {
+  Nextjs Dashboard [icon: layout, label: "Next.js Dashboard"]
+  Electron Desktop App [icon: monitor, label: "Electron Desktop App"]
+  Expo Mobile App [icon: smartphone, label: "Expo Mobile App"]
+}
+
+Monitoring [icon: bar-chart, color: yellow, label: "Monitoring"] {
+  Prometheus [icon: bar-chart-2]
+  Grafana [icon: trending-down]
+  Docker K8s [icon: box, label: "Docker/K8s"]
+}
+
+// Connections: Hardware to ESP32
+Wheels Encoders > Encoder Publisher
+Arms Servos > Arm Publisher
+IMU > IMU Publisher
+
+// ESP32 to Pi
+Encoder Publisher --> ROS2 Core
+Arm Publisher --> ROS2 Core
+IMU Publisher --> Navigation2
+ROS2 Core --> Command Subscriber
+Command Subscriber > Wheels Encoders
+Command Subscriber > Arms Servos
+
+// Sensors to Pi
+RPLIDAR --> Perception
+Realsense Camera --> Perception
+Microphone --> Perception
+GPS --> Navigation2
+Speaker > ROS2 Core
+Display LEDs > ROS2 Core
+
+// Pi Internal
+ROS2 Core <> Navigation2
+ROS2 Core <> MoveIt3
+ROS2 Core <> Perception
+ROS2 Core > RViz rqt
+
+// Pi to Backend
+ROS2 Core --> ROSBridge FastAPI Bridge
+ROSBridge FastAPI Bridge --> API Server
+API Server --> Database MQ TSDB
+
+// Backend to Unity / Frontend
+ROSBridge FastAPI Bridge --> Focus Manager
+API Server --> Focus Manager
+API Server --> Unity Digital Twin
+
+// Unity internal
+Input Router > Focus Manager
+Focus Manager > Entity Prefabs
+Real Sim Mapper > Entity Prefabs
+ROS2 Core <> Real Sim Mapper
+
+// UI Frameworks Integration
+Nextjs Dashboard > API Server
+Electron Desktop App > API Server
+Expo Mobile App > API Server
+Focus Manager > Electron Desktop App
+Focus Manager > Expo Mobile App
+
+// Observability
+ROS2 Core -- Prometheus
+API Server -- Prometheus
+Docker K8s -- Prometheus
+Prometheus > Grafana

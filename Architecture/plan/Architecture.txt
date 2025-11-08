@@ -1,0 +1,67 @@
+title Robotics System Architecture (ROS 2 Edge to Cloud)
+
+Hardware Layer [icon: cpu] {
+  Motors [icon: cpu, label: "Motors / Encoders / Motor Driver"]
+    LIDAR [icon: radio, label: "LiDAR / ToF / Ultrasonic Sensors"]
+      Camera [icon: camera, label: "Camera Module"]
+        IMU [icon: compass, label: "IMU / Orientation Sensor"]
+          Microphone [icon: mic, label: "Microphone Array"]
+            Speaker [icon: volume-2, label: "Speaker"]
+              Display [icon: monitor, label: "Display / Touchscreen"]
+                LED [icon: activity, label: "LED Indicators"]
+                }
+
+                Edge Device Layer [icon: raspberry-pi] {
+                  Edge OS [icon: raspberry-pi, label: "Jetson / Raspberry Pi (Linux + Docker)"]
+                    ROS2 Core [icon: robot, label: "ROS 2 (Jazzy / Iron)"]
+                      Navigation2 [icon: map, label: "Navigation 2 (SLAM / Path Planning / Control)"]
+                        MoveIt3 [icon: cpu, label: "MoveIt 3 (Manipulation / Arm Control)"]
+                          Perception [icon: eye, label: "Perception Nodes (Camera / LiDAR / Audio)"]
+                            RViz [icon: crosshair, label: "RViz / rqt / TF Visualization"]
+                            }
+
+                            Backend Layer [icon: server] {
+                              ROSBridge [icon: plug, label: "rosbridge_server / FastAPI Bridge"]
+                                API [icon: rocket, label: "Fastify / Nest.js API"]
+                                  Database [icon: database, label: "Data Store / MQ / TSDB"]
+                                  }
+
+                                  Frontend Layer [icon: monitor] {
+                                    Dashboard [icon: layout, label: "React / Next.js Dashboard"]
+                                      Simulator [icon: gamepad, label: "Gazebo / Isaac Sim / Unity Robotics Hub"]
+                                      }
+
+                                      Observability Layer [icon: bar-chart] {
+                                        Prometheus [icon: activity, label: "Prometheus"]
+                                          Grafana [icon: bar-chart-2, label: "Grafana"]
+                                            Docker [icon: docker, label: "Docker / Kubernetes"]
+                                            }
+
+                                            // Connections: Hardware to Edge
+                                            Motors --> ROS2 Core: Control
+                                            LIDAR --> Perception: Data
+                                            Camera --> Perception: Frames
+                                            Microphone --> Perception: Audio
+                                            Speaker --> ROS2 Core: Voice Out
+                                            Display --> ROS2 Core: Status / UI
+                                            LED --> ROS2 Core: Feedback
+                                            IMU --> Navigation2: Pose Data
+
+                                            // Edge internal
+                                            ROS2 Core --> Perception
+                                            ROS2 Core --> Navigation2
+                                            ROS2 Core --> MoveIt3
+                                            ROS2 Core --> RViz
+
+                                            // Edge to Backend
+                                            ROS2 Core --> ROSBridge: DDS
+                                            ROSBridge --> API
+                                            API --> Database
+                                            Dashboard --> Simulator
+
+                                            // Observability
+                                            ROS2 Core --> Prometheus
+                                            API --> Prometheus
+                                            Docker --> Prometheus
+                                            Prometheus --> Grafana
+                                            API --> Frontend Layer

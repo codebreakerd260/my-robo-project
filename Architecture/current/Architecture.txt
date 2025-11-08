@@ -1,0 +1,55 @@
+title ROS2 Web Teleoperation Architecture
+
+Web Browser [icon: monitor] {
+  React Dashboard [icon: react]
+  Camera Feed [icon: camera]
+  Virtual Joystick [icon: gamepad]
+  Telemetry Panel [icon: activity]
+  Waypoint Navigation [icon: map]
+  Emergency Stop [icon: alert-triangle]
+}
+
+ROS Bridge Layer [icon: plug] {
+  ROSBridge WebSocket [icon: globe, label: "rosbridge_websocket (9090)"]
+  Video Server [icon: video, label: "web_video_server (8080)"]
+  Authentication Layer [icon: lock]
+}
+
+ROS2 Raspberry Pi [icon: raspberry-pi] {
+  CmdVel Topic [icon: send, label: "/cmd_vel"]
+  Image Topic [icon: image, label: "/camera/image_raw"]
+  Telemetry Topic [icon: bar-chart-2, label: "/telemetry"]
+  Battery Topic [icon: battery, label: "/battery"]
+  Waypoint Topic [icon: navigation, label: "/waypoints"]
+}
+
+ROS2 Nodes [icon: settings] {
+  DiffDrive Node [icon: cpu, label: "diff_drive"]
+  Camera Node [icon: camera, label: "camera_node"]
+  Telemetry Node [icon: activity, label: "telemetry_node"]
+  Battery Node [icon: battery-charging, label: "battery_node"]
+  Navigation Node [icon: map-pin, label: "navigation_node"]
+}
+
+// Connections
+Virtual Joystick > ROSBridge WebSocket: Joystick Input
+ROSBridge WebSocket > CmdVel Topic: Publishes
+CmdVel Topic > DiffDrive Node: Drives
+
+
+
+
+Waypoint Navigation > ROSBridge WebSocket: Waypoint Commands
+ROSBridge WebSocket > Waypoint Topic: Publishes
+Waypoint Topic > Navigation Node: Processes
+
+Emergency Stop > ROSBridge WebSocket: Emergency Stop
+ROSBridge WebSocket > CmdVel Topic: Zero Velocity
+Image Topic < Camera Node: Publishes 20Hz
+Video Server < Image Topic: Streams MJPEG
+Camera Feed < Video Server: Displays
+Telemetry Topic < Telemetry Node: Publishes 1Hz
+ROSBridge WebSocket < Telemetry Topic: Forwards
+Telemetry Panel < ROSBridge WebSocket: Updates
+Battery Topic < Battery Node: Publishes 0.5Hz
+ROSBridge WebSocket < Battery Topic: Forwards
